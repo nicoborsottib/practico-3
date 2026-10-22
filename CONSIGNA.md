@@ -47,7 +47,8 @@ GDB de la Parte 5 y la conexión de cada resultado con la teoría del documento 
 | 3 | `HelloWorld` con `SystemTable->ConOut->OutputString` | Cómo se llega a un servicio del firmware sin libc; offsets de las estructuras en el desensamblado | 03 |
 | 4 | `HelloPrint` con `gST` y `Print` | Constructores de bibliotecas; el costo en tamaño | 04 |
 | 5 | Depuración con GDB | Dirección de carga, `add-symbol-file`, argumentos en `rcx`/`rdx`, shadow space, llamada indirecta, `EFI_STATUS` en `rax` | 42 |
-| 6 | Preguntas y conclusiones | — | — |
+| 6 | Hello World en hardware real (bare metal) | El mismo `.efi` corre sin cambios sobre un firmware real (Insyde); ruta por defecto `\EFI\BOOT\BOOTX64.EFI`; Secure Boot | documento adjunto (TP 3) |
+| 7 | Preguntas y conclusiones | — | — |
 
 ## Decisiones tomadas
 

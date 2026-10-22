@@ -184,7 +184,7 @@ La firma `0x5453595320494249` (`IBI SYST`) confirma que `rdx` apunta a una `EFI_
 
 # Respuestas
 
-> ✏️ Responder las preguntas de la Parte 6 de `GUIA.md`, citando las capturas.
+> ✏️ Responder las preguntas de la Parte 7 de `GUIA.md`, citando las capturas.
 
 ---
 

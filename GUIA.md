@@ -841,25 +841,7 @@ La Shell vuelve al prompt. Para terminar: `quit` en GDB y `Ctrl+A X` en QEMU.
 
 ---
 
-## Parte 6 — Preguntas para cerrar
-
-Las respuestas van al final de `PROCEDIMIENTO.md`, justificadas con lo que vimos:
-
-1. ¿Qué diferencia hay entre UEFI y PI? ¿En qué fase corre nuestra app y por qué todavía
-   puede usar `ConOut`?
-2. ¿Por qué el `.efi` es un PE/COFF y qué consecuencia tiene eso para depurar?
-3. ¿Qué convención de llamada usa UEFI en x64? ¿Qué cambia respecto de System V?
-   Mostralo con los registros y la pila de la Parte 5.
-4. ¿Qué es un protocolo y por qué la llamada a `OutputString` es indirecta?
-5. ¿Quién llama a `UefiMain`? ¿Qué pasa antes de que se ejecute?
-6. ¿Para qué sirve cada archivo del paquete (`.inf`, `.dsc`) y qué hace `PACKAGES_PATH`?
-7. Seguridad: ¿qué implicaría que una app como esta pudiera ejecutarse sin
-   **Secure Boot**? (Pista: corre con los privilegios del firmware, antes que el SO y
-   sin ninguna de sus protecciones.)
-
----
-
-## Parte 7 — El Hello World en hardware real (bare metal)
+## Parte 6 — El Hello World en hardware real (bare metal)
 
 Hasta acá todo corrió sobre **OVMF dentro de QEMU**, un firmware emulado. En esta parte
 llevamos **los mismos `.efi`, sin recompilar**, a una notebook real: arrancamos la UEFI
@@ -876,13 +858,13 @@ Qué se demuestra:
   `Boot####` en la NVRAM.
 - **Secure Boot.** El firmware solo ejecuta imágenes PE/COFF firmadas con una clave de su
   base `db`. Nuestra Shell no está firmada, así que hay que desactivarlo (pregunta 7 de
-  la Parte 6).
+  la Parte 7).
 
 > **Riesgo para la PC:** prácticamente nulo. La app solo escribe en la consola, y la
 > configuración de Secure Boot se vuelve atrás al final. Lo único a cuidar: BitLocker
-> (7.4) y no usar en la Shell comandos que no estén en esta guía.
+> (6.4) y no usar en la Shell comandos que no estén en esta guía.
 
-### 7.1 Qué hace falta
+### 6.1 Qué hace falta
 
 - **Linux con EDK2 y BaseTools**: Partes 1.1 a 1.5. Puede ser una máquina virtual (lo
   hicimos en una VM de VirtualBox). **No** hace falta `make ovmf`.
@@ -894,7 +876,7 @@ Qué se demuestra:
 sudo apt install -y dosfstools     # trae mkfs.vfat, para formatear el pendrive
 ```
 
-### 7.2 Compilar las apps y la Shell
+### 6.2 Compilar las apps y la Shell
 
 Las apps son las mismas de las Partes 2 a 4:
 
@@ -929,7 +911,7 @@ find ~/edk2/Build/Shell -name Shell.efi
 puerto de E/S `0x402`. En QEMU ahí está el debugcon (Parte 2.6), pero en una PC real no
 sabemos qué hay en ese puerto. La RELEASE no escribe nada.
 
-### 7.3 Preparar el pendrive
+### 6.3 Preparar el pendrive
 
 **1. Pasarle el pendrive a la VM.** En VirtualBox: *Dispositivos → USB* y tildar el
 pendrive. Aparece con un nombre genérico (en nuestro caso, *USB Disk 20*). Desde ese
@@ -989,7 +971,7 @@ sudo umount /mnt
 
 Destildarlo en *Dispositivos → USB* y recién ahí sacarlo.
 
-### 7.4 Antes de tocar el firmware: BitLocker
+### 6.4 Antes de tocar el firmware: BitLocker
 
 Si el disco de Windows está cifrado con BitLocker, cambiar Secure Boot hace que, al
 volver, Windows pida la **clave de recuperación**. Hay que fijarse antes, en una
@@ -1004,7 +986,7 @@ manage-bde -status C:
   y suspender la protección: *Panel de control → Cifrado de unidad BitLocker →
   Suspender protección*.
 
-### 7.5 Desactivar Secure Boot
+### 6.5 Desactivar Secure Boot
 
 Para entrar al setup del firmware sin adivinar la tecla, desde la terminal de
 administrador:
@@ -1033,7 +1015,7 @@ firma Authenticode contra los certificados de la variable `db` (Microsoft y el
 fabricante) y contra la lista negra `dbx`. Nuestra Shell y nuestras apps no tienen
 firma, así que con Secure Boot activo el firmware se niega a ejecutarlas.
 
-### 7.6 Arrancar desde el pendrive
+### 6.6 Arrancar desde el pendrive
 
 Con el pendrive enchufado, al encender se aprieta repetidamente la tecla del **boot
 menu**. En Lenovo es **F12** (o **Fn+F12**). En otras marcas suele ser F11, F9, F8 o Esc.
@@ -1042,7 +1024,7 @@ Se elige **EFI USB Device**. El menú muestra las opciones de arranque que armó
 *Windows Boot Manager* (una entrada `Boot####` de la NVRAM), el pendrive (por la ruta
 por defecto `\EFI\BOOT\BOOTX64.EFI`) y PXE por red.
 
-### 7.7 En la UEFI Shell
+### 6.7 En la UEFI Shell
 
 Al arrancar, la Shell imprime su versión, la del firmware y la tabla de mapeo. En el
 encabezado ya se ve **`UEFI v2.80 (INSYDE Corp., 0x77066035)`**: es el firmware real, no
@@ -1105,7 +1087,7 @@ Los datos del firmware salen de `gST->FirmwareVendor`, `gST->FirmwareRevision` y
 `gST->Hdr.Revision`. Es la misma System Table que en QEMU, completada ahora por otro
 firmware: el mismo binario la lee sin cambios.
 
-### 7.8 Dejar todo como estaba
+### 6.8 Dejar todo como estaba
 
 1. En la Shell, `reset` (reinicia) y sacar el pendrive.
 2. Entrar al setup (**F2** al encender o `shutdown /r /fw /t 0` desde Windows) y volver
@@ -1113,19 +1095,19 @@ firmware: el mismo binario la lee sin cambios.
 3. Si se suspendió BitLocker, reanudarlo: *Panel de control → Cifrado de unidad
    BitLocker → Reanudar protección*.
 
-### 7.9 Si algo no anda
+### 6.9 Si algo no anda
 
 | Síntoma | Causa | Solución |
 |---|---|---|
 | `mkfs.vfat: ... contains a mounted filesystem` | Ubuntu montó el pendrive solo | `sudo umount /dev/sdb1` antes de formatear |
-| `cp: no se puede efectuar 'stat' sobre '.../X64/Shell.efi'` | La Shell de `ShellPkg` no queda directo en `X64/` | Usar la ruta `.../Shell/Shell/OUTPUT/Shell.efi` (7.2) |
-| El pendrive no aparece en el boot menu | No es FAT32 o falta `\EFI\BOOT\BOOTX64.EFI` | Revisar 7.3 |
-| *Secure Boot Violation* / el pendrive no arranca | Secure Boot sigue activo | 7.5 |
+| `cp: no se puede efectuar 'stat' sobre '.../X64/Shell.efi'` | La Shell de `ShellPkg` no queda directo en `X64/` | Usar la ruta `.../Shell/Shell/OUTPUT/Shell.efi` (6.2) |
+| El pendrive no aparece en el boot menu | No es FAT32 o falta `\EFI\BOOT\BOOTX64.EFI` | Revisar 6.3 |
+| *Secure Boot Violation* / el pendrive no arranca | Secure Boot sigue activo | 6.5 |
 | `'HelloWorld.efi' is not recognized` | Estás en el `FSx:` equivocado | `map -r` y buscar el que tenga `USB(...)` |
 
-### 7.10 Preguntas
+### 6.10 Preguntas
 
-Las respuestas van en `PROCEDIMIENTO.md`, junto con las de la Parte 6:
+Las respuestas van en `PROCEDIMIENTO.md`, junto con las de la Parte 7:
 
 1. ¿Por qué el mismo `HelloWorld.efi` corre sin cambios en OVMF y en el firmware de
    Insyde? (Pista: PE/COFF reubicable, System Table, protocolos, convención Microsoft
@@ -1136,3 +1118,21 @@ Las respuestas van en `PROCEDIMIENTO.md`, junto con las de la Parte 6:
    variables de la NVRAM intervienen en esa decisión?
 4. En `map -r`, ¿cómo se distingue el pendrive del disco de Windows solo mirando el
    *device path*?
+
+---
+
+## Parte 7 — Preguntas para cerrar
+
+Las respuestas van al final de `PROCEDIMIENTO.md`, justificadas con lo que vimos:
+
+1. ¿Qué diferencia hay entre UEFI y PI? ¿En qué fase corre nuestra app y por qué todavía
+   puede usar `ConOut`?
+2. ¿Por qué el `.efi` es un PE/COFF y qué consecuencia tiene eso para depurar?
+3. ¿Qué convención de llamada usa UEFI en x64? ¿Qué cambia respecto de System V?
+   Mostralo con los registros y la pila de la Parte 5.
+4. ¿Qué es un protocolo y por qué la llamada a `OutputString` es indirecta?
+5. ¿Quién llama a `UefiMain`? ¿Qué pasa antes de que se ejecute?
+6. ¿Para qué sirve cada archivo del paquete (`.inf`, `.dsc`) y qué hace `PACKAGES_PATH`?
+7. Seguridad: ¿qué implicaría que una app como esta pudiera ejecutarse sin
+   **Secure Boot**? (Pista: corre con los privilegios del firmware, antes que el SO y
+   sin ninguna de sus protecciones.)
